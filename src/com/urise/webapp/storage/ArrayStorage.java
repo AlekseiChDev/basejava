@@ -62,4 +62,15 @@ public class ArrayStorage {
     int size() {
         return size;
     }
+
+    void update(Resume resume) {
+        for (int i = 0; i < size; i++) {
+            if (resume.uuid.equals(storage[i].uuid)) {
+                storage[i] = resume;
+                System.out.println("Резюме " + resume + " обновлено");
+                return;
+            }
+        }
+        System.out.println("Ошибка обновления: резюме " + resume + " еще нет в хранилище. ");
+    }
 }
