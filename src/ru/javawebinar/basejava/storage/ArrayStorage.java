@@ -1,7 +1,7 @@
-package com.urise.webapp.storage; /**
+package ru.javawebinar.basejava.storage; /**
  * Array based storage for Resumes
  */
-import com.urise.webapp.model.Resume;
+import ru.javawebinar.basejava.model.Resume;
 
 import java.util.Arrays;
 public class ArrayStorage {
@@ -15,7 +15,7 @@ public class ArrayStorage {
     }
 
     public void save(Resume r) {
-        int index = findIndex(r.uuid);
+        int index = findIndex(r.getUuid());
         if (index != -1) {
             System.out.println("Ошибка сохранения: резюме " + r + " уже есть в хранилище. ");
             return;
@@ -66,7 +66,7 @@ public class ArrayStorage {
     }
 
     public void update(Resume resume) {
-        int index = findIndex(resume.uuid);
+        int index = findIndex(resume.getUuid());
         if (index == -1) {
             System.out.println("Ошибка обновления: резюме " + resume + " еще нет в хранилище. ");
         } else {
@@ -77,7 +77,7 @@ public class ArrayStorage {
 
     private int findIndex(String uuid) {
         for (int i = 0; i < size; i++) {
-            if (uuid.equals(storage[i].uuid)) {
+            if (uuid.equals(storage[i].getUuid())) {
                 return i;
             }
         }
