@@ -1,4 +1,8 @@
-package ru.javawebinar.basejava.storage; /**
+package ru.javawebinar.basejava.storage;
+
+import ru.javawebinar.basejava.model.Resume;
+
+/**
  * Array based storage for Resumes
  */
 
@@ -11,5 +15,13 @@ public class ArrayStorage extends AbstractArrayStorage {
             }
         }
         return -1;
+    }
+
+    protected void insertElement(int index, Resume r) {
+        storage[size] = r;
+    }
+
+    protected void deleteElement(int index) {
+        storage[index] = storage[size - 1];
     }
 }
