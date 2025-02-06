@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ListStorage extends AbstractStorage {
 
-    private List<Resume> storage = new ArrayList();
+    private final List<Resume> storage = new ArrayList<>();
 
     public int size() {
         return storage.size();
@@ -18,8 +18,8 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected final void updateDeep(Resume r, int index) {
-        storage.set(index, r);
+    protected final void updateDeep(Resume r, Object index) {
+        storage.set((Integer) index, r);
     }
 
     /**
@@ -30,30 +30,32 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected final void saveDeep(Resume r, int index) {
+    protected final void saveDeep(Resume r, Object index) {
         storage.add(r);
     }
 
     @Override
-    protected final void deleteDeep(int index) {
-        storage.remove(index);
+    protected final void deleteDeep(Object index) {
+        storage.remove(((Integer) index).intValue());
     }
 
     @Override
-    protected final Resume getDeep(int index) {
-        return storage.get(index);
+    protected final Resume getDeep(Object index) {
+        return storage.get((Integer) index);
     }
 
     @Override
-    protected int getIndex(String uuid) {
-        int index = 0;
-        for (Resume resume: storage
-             ) {
-            if (resume.getUuid().equals(uuid)) {
-              return(index);
+    protected Integer getSearchKey(String uuid) {
+        for (int i = 0; i < storage.size(); i++) {
+            if (storage.get(i).getUuid().equals(uuid)) {
+                return i;
             }
-            index++;
         }
         return -1;
+    }
+
+    @Override
+    protected boolean isExist(Object index) {
+        return  (Integer) index >= 0;
     }
 }

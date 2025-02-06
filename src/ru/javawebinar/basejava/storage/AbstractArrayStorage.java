@@ -24,8 +24,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected final void updateDeep(Resume r, int index) {
-            storage[index] = r;
+    protected final void updateDeep(Resume r, Object index) {
+            storage[(Integer) index] = r;
     }
 
     /**
@@ -36,24 +36,24 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected final void saveDeep(Resume r, int index) {
+    protected final void saveDeep(Resume r, Object index) {
         if (size == STORAGE_LIMIT) {
             throw new StorageException("Storage overflow", r.getUuid());
         }
-        insertElement(r, index);
+        insertElement(r, (Integer) index);
         size++;
     }
 
     @Override
-    protected final void deleteDeep(int index) {
-        fillDeletedElement(index);
+    protected final void deleteDeep(Object index) {
+        fillDeletedElement((Integer) index);
         storage[size - 1] = null;
         size--;
     }
 
     @Override
-    protected final Resume getDeep(int index) {
-        return storage[index];
+    protected final Resume getDeep(Object index) {
+        return storage[(Integer) index];
     }
 
     protected abstract void fillDeletedElement(int index);
