@@ -18,7 +18,7 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected final void updateDeep(Resume r, Object index) {
+    protected final void doUpdate(Resume r, Object index) {
         storage.set((Integer) index, r);
     }
 
@@ -26,21 +26,21 @@ public class ListStorage extends AbstractStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     public Resume[] getAll() {
-        return storage.toArray(new Resume[storage.size()]);
+        return storage.toArray(new Resume[0]);
     }
 
     @Override
-    protected final void saveDeep(Resume r, Object index) {
+    protected final void doSave(Resume r, Object index) {
         storage.add(r);
     }
 
     @Override
-    protected final void deleteDeep(Object index) {
+    protected final void doDelete(Object index) {
         storage.remove(((Integer) index).intValue());
     }
 
     @Override
-    protected final Resume getDeep(Object index) {
+    protected final Resume doGet(Object index) {
         return storage.get((Integer) index);
     }
 

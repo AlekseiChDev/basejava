@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class MapStorage extends AbstractStorage {
 
-    private final Map<String, Resume> storage = new HashMap<String, Resume>();
+    private final Map<String, Resume> storage = new HashMap<>();
 
     public int size() {
         return storage.size();
@@ -20,7 +20,7 @@ public class MapStorage extends AbstractStorage {
     }
 
     @Override
-    protected final void updateDeep(Resume r, Object uuid) {
+    protected final void doUpdate(Resume r, Object uuid) {
         storage.put((String) uuid, r);
     }
 
@@ -34,17 +34,17 @@ public class MapStorage extends AbstractStorage {
     }
 
     @Override
-    protected final void saveDeep(Resume r, Object uuid) {
+    protected final void doSave(Resume r, Object uuid) {
         storage.put((String) uuid, r);
     }
 
     @Override
-    protected final void deleteDeep(Object uuid) {
+    protected final void doDelete(Object uuid) {
         storage.remove((String) uuid);
     }
 
     @Override
-    protected final Resume getDeep(Object uuid) {
+    protected final Resume doGet(Object uuid) {
         return storage.get((String) uuid);
     }
 
