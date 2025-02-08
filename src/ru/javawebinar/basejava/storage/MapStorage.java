@@ -2,9 +2,9 @@ package ru.javawebinar.basejava.storage;
 
 import ru.javawebinar.basejava.model.Resume;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
+import static java.util.Collections.sort;
 
 
 public class MapStorage extends AbstractStorage {
@@ -27,9 +27,9 @@ public class MapStorage extends AbstractStorage {
     /**
      * @return array, contains only Resumes in storage (without null)
      */
-    public Resume[] getAll() {
-        Resume[] all = storage.values().toArray(new Resume[0]);
-        Arrays.sort(all);
+    public List<Resume> getAllSorted() {
+        List<Resume> all = new ArrayList<>(storage.values());
+        sort(all);
         return all;
     }
 
