@@ -25,7 +25,7 @@ public class ListStorage extends AbstractStorage {
     /**
      * @return array, contains only Resumes in storage (without null)
      */
-    public List<Resume> getAllSorted() {
+    public List<Resume> getAll() {
         return storage;
     }
 

@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.sort;
-
 public class MapResumeStorage extends AbstractStorage {
 
     private final Map<String, Resume> storage = new HashMap<>();
@@ -29,9 +27,8 @@ public class MapResumeStorage extends AbstractStorage {
     /**
      * @return array, contains only Resumes in storage (without null)
      */
-    public List<Resume> getAllSorted() {
+    public List<Resume> getAll() {
         List<Resume> all = new ArrayList<>(storage.values());
-        sort(all);
         return all;
     }
 
