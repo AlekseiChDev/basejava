@@ -7,8 +7,6 @@ import ru.javawebinar.basejava.model.Resume;
 import java.util.Comparator;
 import java.util.List;
 
-import static java.util.Collections.sort;
-
 public abstract class AbstractStorage implements Storage {
     private static final Comparator<Resume> RESUME_COMPARATOR = Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid);
 
@@ -50,7 +48,7 @@ public abstract class AbstractStorage implements Storage {
 
     public List<Resume> getAllSorted() {
         List<Resume> all = getAll();
-        sort(all, RESUME_COMPARATOR);
+        all.sort(RESUME_COMPARATOR);
         return all;
     }
 
