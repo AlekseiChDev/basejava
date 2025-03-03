@@ -55,7 +55,7 @@ public abstract class AbstractStorage<SK> implements Storage {
     }
 
     public List<Resume> getAllSorted() {
-        List<Resume> all = getAll();
+        List<Resume> all = doCopyAll();
         all.sort(RESUME_COMPARATOR);
         return all;
     }
@@ -72,5 +72,5 @@ public abstract class AbstractStorage<SK> implements Storage {
 
     protected abstract boolean isExist(SK searchKey);
 
-    protected abstract List<Resume> getAll();
+    protected abstract List<Resume> doCopyAll();
 }

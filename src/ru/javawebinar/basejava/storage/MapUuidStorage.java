@@ -28,7 +28,7 @@ public class MapUuidStorage extends AbstractStorage<String> {
     /**
      * @return array, contains only Resumes in storage (without null)
      */
-    public List<Resume> getAll() {
+    public List<Resume> doCopyAll() {
         List<Resume> all = new ArrayList<>(storage.values());
         return all;
     }
