@@ -32,4 +32,16 @@ public class Company {
     public int hashCode() {
         return Objects.hash(name, url, periods);
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public List<Period> getPeriods() {
+        return periods;
+    }
 }

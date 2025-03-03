@@ -35,4 +35,20 @@ public class Period {
         return fromDate +  " - " + toDate + " " + post + '\n' +
                 "                     " + description;
     }
+
+    public LocalDate getFromDate() {
+        return fromDate;
+    }
+
+    public LocalDate getToDate() {
+        return toDate;
+    }
+
+    public String getPost() {
+        return post;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }
