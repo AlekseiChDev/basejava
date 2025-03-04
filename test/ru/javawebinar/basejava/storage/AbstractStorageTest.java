@@ -10,6 +10,8 @@ import ru.javawebinar.basejava.model.Resume;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ru.javawebinar.basejava.ResumeTestData.fillResume;
+
 public abstract class AbstractStorageTest {
     protected Storage storage;
 
@@ -28,10 +30,10 @@ public abstract class AbstractStorageTest {
     private static final Resume RESUME_4;
 
     static {
-        RESUME_1 = new Resume(UUID_1, NAME_1);
-        RESUME_2 = new Resume(UUID_2, NAME_2);
-        RESUME_3 = new Resume(UUID_3, NAME_3);
-        RESUME_4 = new Resume(UUID_4, NAME_4);
+        RESUME_1 = fillResume(UUID_1, NAME_1);
+        RESUME_2 = fillResume(UUID_2, NAME_2);
+        RESUME_3 = fillResume(UUID_3, NAME_3);
+        RESUME_4 = fillResume(UUID_4, NAME_4);
     }
     protected AbstractStorageTest(Storage storage) {
         this.storage = storage;

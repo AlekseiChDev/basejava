@@ -10,7 +10,20 @@ public class ResumeTestData {
     private static final String UUID_1 = "uuid1";
 
     public static void main(String[] args) {
-        Resume resume = new Resume(UUID_1, "Name1");
+
+        Resume resume = fillResume(UUID_1, "Name1");
+
+        System.out.println(resume);
+        for (ContactType contactType : ContactType.values()) {
+            System.out.println(contactType + ":" + resume.getContact(contactType));
+        }
+        for (SectionType sectionType : SectionType.values()) {
+            System.out.println(sectionType + "\n" + resume.getSection(sectionType));
+        }
+    }
+
+    public static Resume fillResume(String uuid, String fullName ) {
+        Resume resume = new Resume(uuid, fullName);
         resume.addContact(ContactType.PHONE, "+7(921) 855-0482");
         resume.addContact(ContactType.SKYPE, "skype:grigory.kislin");
         resume.addContact(ContactType.MAIL, "gkislin@yandex.ru");
@@ -18,7 +31,6 @@ public class ResumeTestData {
         resume.addContact(ContactType.GITHUB, "");
         resume.addContact(ContactType.STATCKOVERFLOW, "");
         resume.addContact(ContactType.HOME_PAGE, "");
-
         resume.addSection(SectionType.PERSONAL, new TextSection("Personal data"));
         resume.addSection(SectionType.OBJECTIVE, new TextSection("Position"));
 
@@ -37,22 +49,14 @@ public class ResumeTestData {
         List<Company> companies = new ArrayList<>();
         companies.add(new Company("Company1", "URL1", periods ));
         resume.addSection(SectionType.EXPERIENCE, new CompanySection(companies));
-        System.out.println(resume);
 
         periods.clear();
         periods.add(new Period((LocalDate.of(2018, 1, 8)), (LocalDate.of(2019, 1, 8)), "", "Description"));
         companies.clear();
         companies.add(new Company("Universitet1", "URL2", periods ));
         resume.addSection(SectionType.EXPERIENCE, new CompanySection(companies));
-        System.out.println(resume);
-
         resume.addSection(SectionType.EDUCATION, new CompanySection(companies));
 
-        for (ContactType contactType : ContactType.values()) {
-            System.out.println(contactType + ":" + resume.getContact(contactType));
-        }
-        for (SectionType sectionType : SectionType.values()) {
-            System.out.println(sectionType + "\n" + resume.getSection(sectionType));
-        }
+        return resume;
     }
 }

@@ -15,19 +15,26 @@ public class MainFile {
             throw new RuntimeException("Error", e);
         }
 
-        File dir = new File("./src/ru/javawebinar/basejava");
-        System.out.println(dir.isDirectory());
-        String[] list = dir.list();
-        if (list != null) {
-            for (String name : list) {
-                System.out.println(name);
-            }
-        }
-
         try (FileInputStream fis = new FileInputStream(filePath)) {
             System.out.println(fis.read());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+
+        File dir = new File("./src/ru/javawebinar/basejava");
+        outNameFiles(dir);
+    }
+
+    private static void outNameFiles(File dir) {
+        File[] listFiles = dir.listFiles();
+        if (listFiles != null) {
+            for (File file : listFiles) {
+                if (file.isDirectory()) {
+                    outNameFiles(file);
+                } else {
+                    System.out.println(file.getName());
+                }
+            }
         }
     }
 }
