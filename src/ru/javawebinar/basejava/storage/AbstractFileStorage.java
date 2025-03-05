@@ -14,7 +14,7 @@ import java.util.Objects;
  * 22.07.2016
  */
 public abstract class AbstractFileStorage extends AbstractStorage<File> {
-    private File directory;
+    private final File directory;
 
     protected AbstractFileStorage(File directory) {
         Objects.requireNonNull(directory, "directory must not be null");
@@ -29,18 +29,30 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     public void clear() {
-        File[] files = directory.listFiles(File::isFile);
-        if (files != null) {
-            for (File file : files) {
-                file.delete();
+        try {
+            File[] files = directory.listFiles(File::isFile);
+            if (files == null) {
+                throw new StorageException("Read directory error", null);
             }
+            for (File file : files) {
+                doDelete(file);
+            }
+        } catch (SecurityException e) {
+            throw new StorageException("Not access to the directory", null);
         }
     }
 
     @Override
     public int size() {
-        File[] files = directory.listFiles(File::isFile);
-        return (files != null) ? files.length : 0;
+        try {
+            File[] files = directory.listFiles(File::isFile);
+            if (files == null) {
+                throw new StorageException("Read directory error", null);
+            }
+            return files.length;
+        } catch (SecurityException e) {
+            throw new StorageException("Not access to the directory", null);
+        }
     }
 
     @Override
@@ -73,28 +85,38 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     }
 
     protected abstract void doWrite(Resume r, File file) throws IOException;
+    protected abstract Resume doRead(File file) throws IOException;
 
     @Override
     protected Resume doGet(File file) {
-        return fillResume(file);
+        try {
+            return doRead(file);
+        } catch (IOException e) {
+            throw new StorageException("IO error", file.getName(), e);
+        }
     }
 
     @Override
     protected void doDelete(File file) {
-        file.delete();
+        if (!file.delete()) {
+            throw new StorageException("Delete file error", file.getName());
+        }
     }
 
     @Override
     protected List<Resume> doCopyAll() {
-        File[] files = directory.listFiles(File::isFile);
-        List<Resume> list = new ArrayList<>();
-        if (files != null) {
-            for (File file : files) {
-                list.add(fillResume(file));
+        try {
+            File[] files = directory.listFiles(File::isFile);
+            if (files == null) {
+                throw new StorageException("Read directory error", null);
             }
+            List<Resume> list = new ArrayList<>();
+            for (File file : files) {
+                list.add(doGet(file));
+            }
+            return list;
+        } catch (SecurityException e) {
+            throw new StorageException("Not access to the directory", null);
         }
-        return list;
     }
-
-    protected abstract Resume fillResume(File file);
 }
