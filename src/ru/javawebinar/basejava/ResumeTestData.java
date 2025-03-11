@@ -2,9 +2,7 @@ package ru.javawebinar.basejava;
 
 import ru.javawebinar.basejava.model.*;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Month;
 
 public class ResumeTestData {
     private static final String UUID_1 = "uuid1";
@@ -34,29 +32,27 @@ public class ResumeTestData {
         resume.addSection(SectionType.PERSONAL, new TextSection("Personal data"));
         resume.addSection(SectionType.OBJECTIVE, new TextSection("Position"));
 
-        List<String> achivments = new ArrayList<>();
-        achivments.add("Team organization");
-        achivments.add("Web Application Development");
-        resume.addSection(SectionType.ACHIEVEMENT, new ListSection(achivments));
-
-        List<String> qualifications = new ArrayList<>();
-        qualifications.add("JEE AS: GlassFish ");
-        qualifications.add("DB: PostgreSQL");
-        resume.addSection(SectionType.QUALIFICATIONS, new ListSection(qualifications));
-
-        List<Period> periods = new ArrayList<>();
-        periods.add(new Period((LocalDate.of(2020, 1, 8)), (LocalDate.of(2022, 1, 8)), "Post", "Description"));
-        List<Company> companies = new ArrayList<>();
-        companies.add(new Company("Company1", "URL1", periods ));
-        resume.addSection(SectionType.EXPERIENCE, new CompanySection(companies));
-
-        periods.clear();
-        periods.add(new Period((LocalDate.of(2018, 1, 8)), (LocalDate.of(2019, 1, 8)), "", "Description"));
-        companies.clear();
-        companies.add(new Company("Universitet1", "URL2", periods ));
-        resume.addSection(SectionType.EXPERIENCE, new CompanySection(companies));
-        resume.addSection(SectionType.EDUCATION, new CompanySection(companies));
+        resume.addSection(SectionType.ACHIEVEMENT, new ListSection("Team organization", "Web Application Development"));
+        resume.addSection(SectionType.QUALIFICATIONS, new ListSection("JEE AS: GlassFish", "DB: PostgreSQL"));
+        resume.addSection(SectionType.EXPERIENCE,
+                new CompanySection(
+                        new Company("Company11", "http://Company11.ru",
+                                new Company.Period(2005, Month.JANUARY, "position1", "content1"),
+                                new Company.Period(2001, Month.MARCH, 2005, Month.JANUARY, "position2", "content2"))));
+        resume.addSection(SectionType.EDUCATION,
+                new CompanySection(
+                        new Company("Universitet1", "http://Universitet.ru",
+                                new Company.Period(1996, Month.JANUARY, "student", "content1"),
+                                new Company.Period(2001, Month.MARCH, 2005, Month.JANUARY, "aspirant", "content2"))));
 
         return resume;
+
+
+
+
+
+
+
+
     }
 }
