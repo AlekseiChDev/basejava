@@ -2,13 +2,12 @@ package ru.javawebinar.basejava.storage;
 
 import ru.javawebinar.basejava.model.Resume;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class ObjectStreamStorage extends AbstractFileStorage {
-    protected ObjectStreamStorage(File directory, SerializationStrategy serializationStrategy) {
+public class ObjectStreamPathStorage extends AbstractPathStorage {
+    protected ObjectStreamPathStorage(String directory, SerializationStrategy serializationStrategy) {
         super(directory, serializationStrategy);
     }
 

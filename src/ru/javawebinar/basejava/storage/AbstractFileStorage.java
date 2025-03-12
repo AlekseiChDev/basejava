@@ -14,12 +14,15 @@ import java.util.Objects;
  */
 public abstract class AbstractFileStorage extends AbstractStorage<File> {
     private final File directory;
+    protected SerializationStrategy serializationStrategy;
 
     protected abstract void doWrite(Resume r, OutputStream os) throws IOException;
 
     protected abstract Resume doRead(InputStream is) throws IOException;
 
-    protected AbstractFileStorage(File directory) {
+    protected AbstractFileStorage(File directory, SerializationStrategy serializationStrategy) {
+        this.serializationStrategy = serializationStrategy;
+
         Objects.requireNonNull(directory, "directory must not be null");
         if (!directory.isDirectory()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not directory");
@@ -84,6 +87,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         } catch (IOException e) {
             throw new StorageException("IO error", file.getName(), e);
         }
+        doUpdate(r, file);
     }
 
        @Override

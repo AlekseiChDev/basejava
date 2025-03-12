@@ -22,17 +22,18 @@ public class MainFile {
         }
 
         File dir = new File("./src/ru/javawebinar/basejava");
-        outNameFiles(dir);
+        outNameFiles(dir, "");
     }
 
-    private static void outNameFiles(File dir) {
+    private static void outNameFiles(File dir, String shift) {
         File[] listFiles = dir.listFiles();
         if (listFiles != null) {
             for (File file : listFiles) {
                 if (file.isDirectory()) {
-                    outNameFiles(file);
+                    System.out.println(shift + "[" +file.getName() + "]");
+                    outNameFiles(file, shift + " ");
                 } else {
-                    System.out.println(file.getName());
+                    System.out.println(shift + file.getName());
                 }
             }
         }

@@ -44,7 +44,7 @@ public class Company  implements Serializable {
         return "Company(" + homePage + "," + periods + ')';
     }
 
-    public static class Period {
+    public static class Period implements Serializable{
         private final LocalDate startDate;
         private final LocalDate endDate;
         private final String title;
