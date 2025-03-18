@@ -11,16 +11,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
-public abstract class AbstractPathStorage extends AbstractStorage<Path> {
+public class PathStorage extends AbstractStorage<Path> {
     private Path directory;
-    protected SerializationStrategy serializationStrategy;
+    private SerializationStrategy serializationStrategy;
 
-    protected abstract void doWrite(Resume r, OutputStream os) throws IOException;
-
-    protected abstract Resume doRead(InputStream is) throws IOException;
-
-    protected AbstractPathStorage(String dir, SerializationStrategy serializationStrategy) {
+    public PathStorage(String dir, SerializationStrategy serializationStrategy) {
         this.serializationStrategy = serializationStrategy;
         directory = Paths.get(dir);
         Objects.requireNonNull(directory, "directory must not be null");
@@ -31,16 +28,12 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
 
     @Override
     public void clear() {
-        try {
-            Files.list(directory).forEach(this::doDelete);
-        } catch (IOException e) {
-            throw new StorageException("Path delete error", null);
-        }
+        getFiles().forEach(this::doDelete);
     }
 
     @Override
     public int size() {
-        return directory.toFile().listFiles().length;
+        return (int) getFiles().count();
     }
 
     @Override
@@ -90,14 +83,24 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
 
     @Override
     protected List<Resume> doCopyAll() {
-        File[] files = directory.toFile().listFiles();
-        if (files == null) {
-            throw new StorageException("Directory read error", null);
-        }
-        List<Resume> list = new ArrayList<>(files.length);
-        for (File file : files) {
-            list.add(doGet(file.toPath()));
-        }
+        List<Resume> list = new ArrayList<>();
+        getFiles().forEach(path -> { list.add(doGet(path)); });
         return list;
+    }
+
+    private void doWrite(Resume r, OutputStream os) throws IOException{
+        serializationStrategy.doWrite(r, os);
+    }
+
+    private Resume doRead(InputStream is) throws IOException{
+        return  serializationStrategy.doRead(is);
+    }
+
+    private Stream<Path> getFiles() {
+        try {
+            return Files.list(directory);
+        } catch (IOException e) {
+            throw new StorageException("Read directory error", null);
+        }
     }
 }

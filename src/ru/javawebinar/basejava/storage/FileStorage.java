@@ -12,15 +12,11 @@ import java.util.Objects;
  * gkislin
  * 22.07.2016
  */
-public abstract class AbstractFileStorage extends AbstractStorage<File> {
+public class FileStorage extends AbstractStorage<File> {
     private final File directory;
-    protected SerializationStrategy serializationStrategy;
+    private SerializationStrategy serializationStrategy;
 
-    protected abstract void doWrite(Resume r, OutputStream os) throws IOException;
-
-    protected abstract Resume doRead(InputStream is) throws IOException;
-
-    protected AbstractFileStorage(File directory, SerializationStrategy serializationStrategy) {
+    public FileStorage(File directory, SerializationStrategy serializationStrategy) {
         this.serializationStrategy = serializationStrategy;
 
         Objects.requireNonNull(directory, "directory must not be null");
@@ -35,30 +31,14 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     public void clear() {
-        try {
-            File[] files = directory.listFiles(File::isFile);
-            if (files == null) {
-                throw new StorageException("Read directory error", null);
-            }
-            for (File file : files) {
-                doDelete(file);
-            }
-        } catch (SecurityException e) {
-            throw new StorageException("Not access to the directory", null);
+        for (File file : getFiles()) {
+            doDelete(file);
         }
     }
 
     @Override
     public int size() {
-        try {
-            File[] files = directory.listFiles(File::isFile);
-            if (files == null) {
-                throw new StorageException("Read directory error", null);
-            }
-            return files.length;
-        } catch (SecurityException e) {
-            throw new StorageException("Not access to the directory", null);
-        }
+        return getFiles().length;
     }
 
     @Override
@@ -108,18 +88,26 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     protected List<Resume> doCopyAll() {
-        try {
-            File[] files = directory.listFiles(File::isFile);
-            if (files == null) {
-                throw new StorageException("Read directory error", null);
-            }
-            List<Resume> list = new ArrayList<>();
-            for (File file : files) {
-                list.add(doGet(file));
-            }
-            return list;
-        } catch (SecurityException e) {
-            throw new StorageException("Not access to the directory", null);
+        List<Resume> list = new ArrayList<>();
+        for (File file : getFiles()) {
+            list.add(doGet(file));
         }
+        return list;
+    }
+
+    protected void doWrite(Resume r, OutputStream os) throws IOException{
+        serializationStrategy.doWrite(r, os);
+    };
+
+    protected Resume doRead(InputStream is) throws IOException{
+        return  serializationStrategy.doRead(is);
+    };
+
+    private File[] getFiles() {
+        File[] files = directory.listFiles(File::isFile);
+        if (files == null) {
+            throw new StorageException("Read directory error", null);
+        }
+        return files;
     }
 }
