@@ -3,6 +3,7 @@ package ru.javawebinar.basejava.storage;
 
 import ru.javawebinar.basejava.exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
+import ru.javawebinar.basejava.storage.serializer.SerializationStrategy;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -14,8 +15,8 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class PathStorage extends AbstractStorage<Path> {
-    private Path directory;
-    private SerializationStrategy serializationStrategy;
+    private final Path directory;
+    private final SerializationStrategy serializationStrategy;
 
     public PathStorage(String dir, SerializationStrategy serializationStrategy) {
         this.serializationStrategy = serializationStrategy;

@@ -2,6 +2,7 @@ package ru.javawebinar.basejava.storage;
 
 import ru.javawebinar.basejava.exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
+import ru.javawebinar.basejava.storage.serializer.SerializationStrategy;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.Objects;
  */
 public class FileStorage extends AbstractStorage<File> {
     private final File directory;
-    private SerializationStrategy serializationStrategy;
+    private final SerializationStrategy serializationStrategy;
 
     public FileStorage(File directory, SerializationStrategy serializationStrategy) {
         this.serializationStrategy = serializationStrategy;
