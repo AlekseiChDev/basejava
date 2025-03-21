@@ -53,7 +53,7 @@ public class PathStorage extends AbstractStorage<Path> {
 
     @Override
     protected boolean isExist(Path path) {
-        return path.toFile().exists();
+        return Files.isRegularFile(path);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class PathStorage extends AbstractStorage<Path> {
         try {
             Files.createFile(path);
         } catch (IOException e) {
-            throw new StorageException("Couldn't create path " + path, path.getFileName().toString(), e);
+            throw new StorageException("Couldn't create path " + path, getFileName(path), e);
         }
         doUpdate(r, path);
     }
@@ -71,14 +71,14 @@ public class PathStorage extends AbstractStorage<Path> {
         try {
             return doRead(new BufferedInputStream(new FileInputStream(path.toFile())));
         } catch (IOException e) {
-            throw new StorageException("Path read error", path.getFileName().toString(), e);
+            throw new StorageException("Path read error", getFileName(path), e);
         }
     }
 
     @Override
     protected void doDelete(Path path) {
         if (!path.toFile().delete()) {
-            throw new StorageException("Path delete error", path.getFileName().toString());
+            throw new StorageException("Path delete error", getFileName(path));
         }
     }
 
@@ -97,11 +97,14 @@ public class PathStorage extends AbstractStorage<Path> {
         return  serializationStrategy.doRead(is);
     }
 
+    private String getFileName(Path path) {
+        return path.getFileName().toString();
+    }
     private Stream<Path> getFiles() {
         try {
             return Files.list(directory);
         } catch (IOException e) {
-            throw new StorageException("Read directory error", null);
+            throw new StorageException("Read directory error", e);
         }
     }
 }
