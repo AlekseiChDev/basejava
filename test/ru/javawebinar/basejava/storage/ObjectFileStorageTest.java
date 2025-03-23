@@ -1,10 +1,10 @@
 package ru.javawebinar.basejava.storage;
 
-import ru.javawebinar.basejava.storage.serializer.StreamSerializationStrategy;
+import ru.javawebinar.basejava.storage.serializer.ObjectStreamSerializer;
 
 public class ObjectFileStorageTest extends AbstractStorageTest {
 
     public ObjectFileStorageTest() {
-        super(new FileStorage(STORAGE_DIR, new StreamSerializationStrategy()));
+        super(new FileStorage(STORAGE_DIR, new ObjectStreamSerializer()));
     }
 }
