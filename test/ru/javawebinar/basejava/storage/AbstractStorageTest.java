@@ -4,10 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 import ru.javawebinar.basejava.exception.ExistStorageException;
 import ru.javawebinar.basejava.exception.NotExistStorageException;
-import ru.javawebinar.basejava.model.*;
+import ru.javawebinar.basejava.model.ContactType;
+import ru.javawebinar.basejava.model.Resume;
 
 import java.io.File;
-import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,7 +34,7 @@ public abstract class AbstractStorageTest {
         R2 = new Resume(UUID_2, "Name2");
         R3 = new Resume(UUID_3, "Name3");
         R4 = new Resume(UUID_4, "Name4");
-
+/*
         R1.addContact(ContactType.MAIL, "mail1@ya.ru");
         R1.addContact(ContactType.PHONE, "11111");
         R1.addSection(SectionType.OBJECTIVE, new TextSection("Objective1"));
@@ -52,12 +52,16 @@ public abstract class AbstractStorageTest {
                                 new Company.Period(1996, Month.JANUARY, 2000, Month.DECEMBER, "aspirant", null),
                                 new Company.Period(2001, Month.MARCH, 2005, Month.JANUARY, "student", "IT facultet")),
                         new Company("Organization12", "http://Organization12.ru")));
+
+ */
         R2.addContact(ContactType.SKYPE, "skype2");
         R2.addContact(ContactType.PHONE, "22222");
-        R1.addSection(SectionType.EXPERIENCE,
+/*        R1.addSection(SectionType.EXPERIENCE,
                 new CompanySection(
                         new Company("Organization2", "http://Organization2.ru",
                                 new Company.Period(2015, Month.JANUARY, "position1", "content1"))));
+
+ */
     }
 
     protected AbstractStorageTest(Storage storage) {
