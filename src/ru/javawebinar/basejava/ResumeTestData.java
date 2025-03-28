@@ -46,13 +46,5 @@ public class ResumeTestData {
                                 new Company.Period(2001, Month.MARCH, 2005, Month.JANUARY, "aspirant", "content2"))));
 
         return resume;
-
-
-
-
-
-
-
-
     }
 }
