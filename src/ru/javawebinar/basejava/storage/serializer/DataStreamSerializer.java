@@ -5,8 +5,8 @@ import ru.javawebinar.basejava.model.*;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public class DataStreamSerializer implements StreamSerializer {
 
@@ -15,15 +15,12 @@ public class DataStreamSerializer implements StreamSerializer {
         try (DataOutputStream dos = new DataOutputStream(os)) {
             dos.writeUTF(r.getUuid());
             dos.writeUTF(r.getFullName());
-            Map<ContactType, String> contacts = r.getContacts();
-            dos.writeInt(contacts.size());
-            for (Map.Entry<ContactType, String> entry : contacts.entrySet()) {
+            writeForEach(dos, r.getContacts().entrySet(), entry -> {
                 dos.writeUTF(entry.getKey().name());
                 dos.writeUTF(entry.getValue());
-            }
-            Map<SectionType, Section> sections = r.getSections();
-            dos.writeInt(sections.size());
-            for (Map.Entry<SectionType, Section> entry : sections.entrySet()) {
+            }) ;
+
+            writeForEach(dos, r.getSections().entrySet(), entry -> {
                 SectionType sectionType = entry.getKey();
                 Section section = entry.getValue();
                 dos.writeUTF(sectionType.name());
@@ -34,29 +31,35 @@ public class DataStreamSerializer implements StreamSerializer {
                         break;
                     case ACHIEVEMENT:
                     case QUALIFICATIONS:
-                        List<String> items = ((ListSection) section).getItems();
-                        dos.writeInt(items.size());
-                        for (String item : items) { dos.writeUTF( item ); }
+                        writeForEach(dos, ((ListSection) section).getItems(), item -> {
+                            dos.writeUTF( item );
+                        }) ;
                         break;
                     case EXPERIENCE:
                     case EDUCATION:
-                        List<Company> companies = ((CompanySection) section).getCompanies();
-                        dos.writeInt(companies.size());
-                        for (Company company : companies) {
+                        writeForEach(dos, ((CompanySection) section).getCompanies(), company -> {
                             dos.writeUTF( company.getHomePage().getName() );
                             dos.writeUTF( company.getHomePage().getUrl() );
-                            List<Company.Period> periods = company.getPeriods();
-                            dos.writeInt(periods.size());
-                            for (Company.Period period : periods) {
+                            writeForEach(dos, company.getPeriods(), period -> {
                                 writeLocalDate(dos, period.getStartDate());
                                 writeLocalDate(dos, period.getEndDate());
                                 dos.writeUTF( period.getTitle() );
                                 dos.writeUTF( period.getDescription() );
-                            }
-                        }
+                            }) ;
+                        }) ;
                         break;
                 }
-            }
+            }) ;
+        }
+    }
+
+    private interface WriterItem<T> {
+        void write(T t) throws IOException;
+    }
+    private <T> void writeForEach(DataOutputStream dos, Collection<T> items, WriterItem<T> writer) throws IOException {
+        dos.writeInt(items.size());
+        for (T  item : items) {
+            writer.write(item);
         }
     }
 
@@ -123,8 +126,6 @@ public class DataStreamSerializer implements StreamSerializer {
     }
 
     private LocalDate readLocalDate(DataInputStream dis) throws IOException {
-        int year = dis.readInt();
-        int month = dis.readInt();
-        return LocalDate.of(year, month, 1);
+        return LocalDate.of(dis.readInt(), dis.readInt(), 1);
     }
  }
