@@ -61,9 +61,7 @@ public class DataStreamSerializer implements StreamSerializer {
             String fullName = dis.readUTF();
             Resume resume = new Resume(uuid, fullName);
 
-            readForSize(dis,()->{
-                resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF());
-            });
+            readForSize(dis,()-> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
             readForSize(dis,()->{
                 SectionType sectionType = SectionType.valueOf(dis.readUTF());
                 resume.addSection(sectionType, readSection(sectionType, dis));
@@ -106,7 +104,7 @@ public class DataStreamSerializer implements StreamSerializer {
                 return new TextSection(dis.readUTF());
             case ACHIEVEMENT:
             case QUALIFICATIONS:
-                List<String> items = new ArrayList<>();;
+                List<String> items = new ArrayList<>();
                 readForSizeToList(dis, items, dis::readUTF);
                 return new ListSection(items);
             case EXPERIENCE:
@@ -124,7 +122,7 @@ public class DataStreamSerializer implements StreamSerializer {
     }
 
     private List<Company.Period> readPeriods(DataInputStream dis) throws IOException {
-        List<Company.Period> periods = new ArrayList<>();;
+        List<Company.Period> periods = new ArrayList<>();
         readForSizeToList(dis, periods, ()-> new Company.Period(readLocalDate(dis),readLocalDate(dis), dis.readUTF(), dis.readUTF() ));
         return periods;
     }
