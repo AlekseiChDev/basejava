@@ -24,30 +24,21 @@ public class DataStreamSerializer implements StreamSerializer {
                 SectionType sectionType = entry.getKey();
                 Section section = entry.getValue();
                 dos.writeUTF(sectionType.name());
-                switch (sectionType){
-                    case PERSONAL:
-                    case OBJECTIVE:
-                        dos.writeUTF(((TextSection) section).getText());
-                        break;
-                    case ACHIEVEMENT:
-                    case QUALIFICATIONS:
-                        writeForEach(dos, ((ListSection) section).getItems(), item -> {
-                            dos.writeUTF( item );
-                        }) ;
-                        break;
-                    case EXPERIENCE:
-                    case EDUCATION:
-                        writeForEach(dos, ((CompanySection) section).getCompanies(), company -> {
-                            dos.writeUTF( company.getHomePage().getName() );
-                            dos.writeUTF( company.getHomePage().getUrl() );
-                            writeForEach(dos, company.getPeriods(), period -> {
-                                writeLocalDate(dos, period.getStartDate());
-                                writeLocalDate(dos, period.getEndDate());
-                                dos.writeUTF( period.getTitle() );
-                                dos.writeUTF( period.getDescription() );
-                            }) ;
-                        }) ;
-                        break;
+                switch (sectionType) {
+                    case PERSONAL, OBJECTIVE -> dos.writeUTF(((TextSection) section).getText());
+                    case ACHIEVEMENT, QUALIFICATIONS ->
+                            writeForEach(dos, ((ListSection) section).getItems(), dos::writeUTF);
+                    case EXPERIENCE, EDUCATION ->
+                            writeForEach(dos, ((CompanySection) section).getCompanies(), company -> {
+                                dos.writeUTF(company.getHomePage().getName());
+                                dos.writeUTF(company.getHomePage().getUrl());
+                                writeForEach(dos, company.getPeriods(), period -> {
+                                    writeLocalDate(dos, period.getStartDate());
+                                    writeLocalDate(dos, period.getEndDate());
+                                    dos.writeUTF(period.getTitle());
+                                    dos.writeUTF(period.getDescription());
+                                });
+                            });
                 }
             }) ;
         }
@@ -69,16 +60,37 @@ public class DataStreamSerializer implements StreamSerializer {
             String uuid = dis.readUTF();
             String fullName = dis.readUTF();
             Resume resume = new Resume(uuid, fullName);
-            int size = dis.readInt();
-            for (int i = 0; i < size; i++) {
+
+            readForSize(dis,()->{
                 resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF());
-            }
-            size = dis.readInt();
-            for (int i = 0; i < size; i++) {
+            });
+            readForSize(dis,()->{
                 SectionType sectionType = SectionType.valueOf(dis.readUTF());
                 resume.addSection(sectionType, readSection(sectionType, dis));
-            }
+            });
             return resume;
+        }
+    }
+
+    private interface ReaderItem {
+        void read() throws IOException;
+    }
+
+    private void readForSize(DataInputStream dis, ReaderItem reader) throws IOException {
+        int size = dis.readInt();
+        for (int i = 0; i < size; i++) {
+            reader.read();
+        }
+    }
+
+    private interface ReaderItemToList<T> {
+        T read() throws IOException;
+    }
+
+    private <T> void readForSizeToList(DataInputStream dis, Collection<T> items, ReaderItemToList<T> reader) throws IOException {
+        int size = dis.readInt();
+        for (int i = 0; i < size; i++) {
+            items.add(reader.read());
         }
     }
 
@@ -94,22 +106,17 @@ public class DataStreamSerializer implements StreamSerializer {
                 return new TextSection(dis.readUTF());
             case ACHIEVEMENT:
             case QUALIFICATIONS:
-                int sizeItems = dis.readInt();
                 List<String> items = new ArrayList<>();;
-                for (int j = 0; j < sizeItems; j++) {
-                    items.add(dis.readUTF());
-                }
+                readForSizeToList(dis, items, dis::readUTF);
                 return new ListSection(items);
             case EXPERIENCE:
             case EDUCATION:
-                int sizeCompanies = dis.readInt();
                 List<Company> companies = new ArrayList<>();
-                for (int j = 0; j < sizeCompanies; j++) {
-                    companies.add(readCompany(dis));
-                }
+                readForSizeToList(dis, companies, ()-> readCompany(dis));
                 return new CompanySection(companies);
+            default:
+                throw new IllegalStateException();
         }
-        throw new IllegalStateException();
     }
 
     private Company readCompany(DataInputStream dis) throws IOException {
@@ -117,11 +124,8 @@ public class DataStreamSerializer implements StreamSerializer {
     }
 
     private List<Company.Period> readPeriods(DataInputStream dis) throws IOException {
-        int size = dis.readInt();
         List<Company.Period> periods = new ArrayList<>();;
-        for (int j = 0; j < size; j++) {
-            periods.add(new Company.Period(readLocalDate(dis),readLocalDate(dis), dis.readUTF(), dis.readUTF() ));
-        }
+        readForSizeToList(dis, periods, ()-> new Company.Period(readLocalDate(dis),readLocalDate(dis), dis.readUTF(), dis.readUTF() ));
         return periods;
     }
 
