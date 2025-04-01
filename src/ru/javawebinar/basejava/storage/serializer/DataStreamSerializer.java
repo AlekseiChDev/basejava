@@ -19,7 +19,6 @@ public class DataStreamSerializer implements StreamSerializer {
                 dos.writeUTF(entry.getKey().name());
                 dos.writeUTF(entry.getValue());
             }) ;
-
             writeForEach(dos, r.getSections().entrySet(), entry -> {
                 SectionType sectionType = entry.getKey();
                 Section section = entry.getValue();
@@ -60,9 +59,8 @@ public class DataStreamSerializer implements StreamSerializer {
             String uuid = dis.readUTF();
             String fullName = dis.readUTF();
             Resume resume = new Resume(uuid, fullName);
-
-            readForSize(dis,()-> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
-            readForSize(dis,()->{
+            readItemsToList(dis,()-> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
+            readItemsToList(dis,()->{
                 SectionType sectionType = SectionType.valueOf(dis.readUTF());
                 resume.addSection(sectionType, readSection(sectionType, dis));
             });
@@ -74,7 +72,7 @@ public class DataStreamSerializer implements StreamSerializer {
         void read() throws IOException;
     }
 
-    private void readForSize(DataInputStream dis, ReaderItem reader) throws IOException {
+    private void readItemsToList(DataInputStream dis, ReaderItem reader) throws IOException {
         int size = dis.readInt();
         for (int i = 0; i < size; i++) {
             reader.read();
@@ -85,11 +83,13 @@ public class DataStreamSerializer implements StreamSerializer {
         T read() throws IOException;
     }
 
-    private <T> void readForSizeToList(DataInputStream dis, Collection<T> items, ReaderItemToList<T> reader) throws IOException {
+    private <T> List<T> readList(DataInputStream dis, ReaderItemToList<T> reader) throws IOException {
+        List<T> list = new ArrayList<>();
         int size = dis.readInt();
         for (int i = 0; i < size; i++) {
-            items.add(reader.read());
+            list.add(reader.read());
         }
+        return list;
     }
 
     private void writeLocalDate(DataOutputStream dos, LocalDate localDate) throws IOException {
@@ -98,33 +98,13 @@ public class DataStreamSerializer implements StreamSerializer {
     }
 
     private Section readSection(SectionType type, DataInputStream dis) throws IOException {
-        switch (type){
-            case PERSONAL:
-            case OBJECTIVE:
-                return new TextSection(dis.readUTF());
-            case ACHIEVEMENT:
-            case QUALIFICATIONS:
-                List<String> items = new ArrayList<>();
-                readForSizeToList(dis, items, dis::readUTF);
-                return new ListSection(items);
-            case EXPERIENCE:
-            case EDUCATION:
-                List<Company> companies = new ArrayList<>();
-                readForSizeToList(dis, companies, ()-> readCompany(dis));
-                return new CompanySection(companies);
-            default:
-                throw new IllegalStateException();
-        }
-    }
-
-    private Company readCompany(DataInputStream dis) throws IOException {
-        return new Company(new Link(dis.readUTF(), dis.readUTF()), readPeriods(dis));
-    }
-
-    private List<Company.Period> readPeriods(DataInputStream dis) throws IOException {
-        List<Company.Period> periods = new ArrayList<>();
-        readForSizeToList(dis, periods, ()-> new Company.Period(readLocalDate(dis),readLocalDate(dis), dis.readUTF(), dis.readUTF() ));
-        return periods;
+        return switch (type) {
+            case PERSONAL, OBJECTIVE -> new TextSection(dis.readUTF());
+            case ACHIEVEMENT, QUALIFICATIONS -> new ListSection(readList(dis, dis::readUTF));
+            case EXPERIENCE, EDUCATION -> new CompanySection(
+                    readList(dis, () -> new Company(new Link(dis.readUTF(), dis.readUTF()),
+                            readList(dis, () -> new Company.Period(readLocalDate(dis), readLocalDate(dis), dis.readUTF(), dis.readUTF())))));
+        };
     }
 
     private LocalDate readLocalDate(DataInputStream dis) throws IOException {
