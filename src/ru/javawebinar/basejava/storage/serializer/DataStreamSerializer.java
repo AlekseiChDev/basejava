@@ -59,8 +59,8 @@ public class DataStreamSerializer implements StreamSerializer {
             String uuid = dis.readUTF();
             String fullName = dis.readUTF();
             Resume resume = new Resume(uuid, fullName);
-            readItemsToList(dis,()-> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
-            readItemsToList(dis,()->{
+            readItems(dis,()-> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
+            readItems(dis,()->{
                 SectionType sectionType = SectionType.valueOf(dis.readUTF());
                 resume.addSection(sectionType, readSection(sectionType, dis));
             });
@@ -72,18 +72,18 @@ public class DataStreamSerializer implements StreamSerializer {
         void read() throws IOException;
     }
 
-    private void readItemsToList(DataInputStream dis, ReaderItem reader) throws IOException {
+    private void readItems(DataInputStream dis, ReaderItem reader) throws IOException {
         int size = dis.readInt();
         for (int i = 0; i < size; i++) {
             reader.read();
         }
     }
 
-    private interface ReaderItemToList<T> {
+    private interface ReaderItemList<T> {
         T read() throws IOException;
     }
 
-    private <T> List<T> readList(DataInputStream dis, ReaderItemToList<T> reader) throws IOException {
+    private <T> List<T> readList(DataInputStream dis, ReaderItemList<T> reader) throws IOException {
         List<T> list = new ArrayList<>();
         int size = dis.readInt();
         for (int i = 0; i < size; i++) {
